@@ -12,7 +12,6 @@ var chartMargin = {
   bottom: 50,
   left: 50
 };
-
 // Define dimensions of the chart area
 var chartWidth = svgWidth - chartMargin.left - chartMargin.right;
 var chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
@@ -22,7 +21,6 @@ var svg = d3.select(".chart")
 .append("svg")
 .attr("width", svgWidth)
 .attr("height", svgHeight);
-
 
 // shift everything over by the margins
 var chartGroup = svg.append("g")
@@ -60,3 +58,58 @@ chartGroup.append("g")
 chartGroup.append("g")
 .call(leftAxis);
 
+//Step 5: Create circles
+var circlesGroup = chartGroup.selectAll("circle")
+.data(Datasets)
+.enter()
+.append("circle")
+.attr("cx", d => xLinearScale(d.poverty))
+.attr("cy", d => yLinearScale(d.healthcare))
+.attr("r", "10")
+.attr("fill", "lightgray")
+.attr("opacity", ".5")
+.attr("stroke-width","2")
+.attr("stroke","darkgray");
+
+console.log(Datasets);
+
+//Step 6: Initialize tool tip
+    // ==============================
+    var toolTip = d3.tip()
+      .attr("class", "tooltip")
+      .offset([80, -60])
+      .html(function(d) {
+        return (`${d.data}<br>poverty: ${d.poverty}<br>Healthcare: ${d.healthcare}`);
+      });
+  // Step 7: Create tooltip in the chart
+    // ==============================
+    chartGroup.call(toolTip);
+
+    // Step 8: Create event listeners to display and hide the tooltip
+    // ==============================
+    circlesGroup.on("click", function(data) {
+      toolTip.show(data, this);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      });
+
+    // Create axes labels
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 40)
+      .attr("x", 0 - (chartHeight / 2))
+      .attr("dy", "1em")
+      .attr("class", "axisText")
+      .text("Correlations discovered");
+
+    chartGroup.append("text")
+      .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 30})`)
+      .attr("class", "axisText")
+      .text("Healthcare");
+  }).catch(function(error) {
+    console.log(error);
+  });
+  function makeResponsive();
+    
